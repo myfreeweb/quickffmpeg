@@ -28,6 +28,12 @@ ApplicationWindow {
 			Layout.fillWidth: true
 			anchors.fill: parent
 			source: videoProducer
+			MouseArea {
+				anchors.fill: parent
+				hoverEnabled: true
+				onEntered: videoProducer.start()
+				onExited: videoProducer.stop()
+			}
 		}
 	}
 }

@@ -12,8 +12,7 @@ FFVideoSource::FFVideoSource(QObject *parent) : QObject(parent), _surface(0) {
 }
 
 FFVideoSource::~FFVideoSource() {
-	if (_process.isOpen())
-		_process.kill();
+	stop();
 	closeSurface();
 }
 
@@ -38,7 +37,7 @@ QUrl FFVideoSource::fileUrl() const {
 
 void FFVideoSource::setFileUrl(QUrl u) {
 	_fileUrl = u;
-	start();
+	restart();
 }
 
 QUrl FFVideoSource::ffmpegUrl() const {
@@ -47,7 +46,7 @@ QUrl FFVideoSource::ffmpegUrl() const {
 
 void FFVideoSource::setFfmpegUrl(QUrl u) {
 	_ffmpegUrl = u;
-	start();
+	restart();
 }
 
 QUrl FFVideoSource::ffprobeUrl() const {
@@ -56,12 +55,11 @@ QUrl FFVideoSource::ffprobeUrl() const {
 
 void FFVideoSource::setFfprobeUrl(QUrl u) {
 	_ffprobeUrl = u;
-	start();
+	restart();
 }
 
 void FFVideoSource::start() {
-	if (_process.isOpen())
-		_process.kill();
+	stop();
 	if (_fileUrl.toString() == "") return;
 	if (_ffprobeUrl.toString() == "") return;
 	if (_ffmpegUrl.toString() == "") return;
@@ -85,10 +83,22 @@ void FFVideoSource::start() {
 
 	_process.start(_ffmpegUrl.toLocalFile(),
 				   QStringList() << "-i" << _fileUrl.toLocalFile() << "-hide_banner" << "-loglevel" << "panic" << "-pix_fmt" << "yuv420p" << "-f" << "rawvideo" << "-vcodec" << "rawvideo" << "-");
+	_started = true;
+}
+
+void FFVideoSource::restart() {
+	if (_started)
+		start();
+}
+
+void FFVideoSource::stop() {
+	if (_process.isOpen())
+		_process.kill();
+	_started = false;
 }
 
 void FFVideoSource::timerEvent(QTimerEvent*) {
-	if (!_surface || !_process.isOpen()) return;
+	if (!_surface || !_started || !_process.isOpen()) return;
 	const size_t frSize = _size.width()*_size.height()*1.5;
 	QVideoFrame frame(frSize, _size, _size.width(), QVideoFrame::Format_YUV420P);
 	frame.map(QAbstractVideoBuffer::WriteOnly);

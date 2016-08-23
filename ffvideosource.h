@@ -35,11 +35,15 @@ public:
 	QUrl ffprobeUrl() const;
 	void setFfprobeUrl(QUrl u);
 
+	Q_INVOKABLE void start();
+	Q_INVOKABLE void restart();
+	Q_INVOKABLE void stop();
+
 protected:
 	void timerEvent(QTimerEvent*);
 
 private:
-	void start();
+	bool _started = false;
 	void closeSurface();
 	QAbstractVideoSurface* _surface;
 	QUrl _fileUrl;

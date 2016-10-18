@@ -3,7 +3,8 @@ QT += qml quick core multimedia widgets
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    ffvideosource.cpp
+    ffvideosource.cpp \
+    util.cpp
 
 RESOURCES += qml.qrc
 
@@ -14,4 +15,5 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 HEADERS += \
-    ffvideosource.h
+    ffvideosource.h \
+    util.h

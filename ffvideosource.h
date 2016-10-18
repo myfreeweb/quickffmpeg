@@ -52,7 +52,4 @@ private:
 	QSize _size;
 	QProcess _process;
 
-signals:
-
-public slots:
 };
